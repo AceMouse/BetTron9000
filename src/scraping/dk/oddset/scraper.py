@@ -51,7 +51,9 @@ def get_oddset():
                                 away_odds = str(i['prices'][0]['decimal'])
                             else:
                                 tie_odds = str(i['prices'][0]['decimal'])
-                    bet = Bet.Bet(home_name, away_name, home_odds, tie_odds, away_odds,
+                    bet = Bet.Bet(home_name.replace(" (k)", '').replace(" (W)", ''),
+                                  away_name.replace(' (k)', '').replace(" (W)", ''),
+                                  home_odds, tie_odds, away_odds,
                                   provider, provider, provider,
                                   time)
                     bets[bet.__hash__()] = bet

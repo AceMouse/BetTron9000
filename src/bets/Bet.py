@@ -16,15 +16,26 @@ class Bet:
         self.arb = ac.get_arb_percentage(home_odds, tie_odds, away_odds)
 
     def merge(self, other):
-        if float(self.home_odds) < float(other.home_odds):
-            self.home_odds = other.home_odds
-            self.home_odds_provider = other.home_odds_provider
-        if float(self.tie_odds) < float(other.tie_odds):
-            self.tie_odds = other.tie_odds
-            self.tie_odds_provider = other.tie_odds_provider
-        if float(self.away_odds) < float(other.away_odds):
-            self.away_odds = other.away_odds
-            self.away_odds_provider = other.away_odds_provider
+        if self.home_name.lower() == other.home_name.lower():
+            if float(self.home_odds) < float(other.home_odds):
+                self.home_odds = other.home_odds
+                self.home_odds_provider = other.home_odds_provider
+            if float(self.tie_odds) < float(other.tie_odds):
+                self.tie_odds = other.tie_odds
+                self.tie_odds_provider = other.tie_odds_provider
+            if float(self.away_odds) < float(other.away_odds):
+                self.away_odds = other.away_odds
+                self.away_odds_provider = other.away_odds_provider
+        else:
+            if float(self.home_odds) < float(other.away_odds):
+                self.home_odds = other.away_odds
+                self.home_odds_provider = other.away_odds_provider
+            if float(self.tie_odds) < float(other.tie_odds):
+                self.tie_odds = other.tie_odds
+                self.tie_odds_provider = other.tie_odds_provider
+            if float(self.away_odds) < float(other.home_odds):
+                self.away_odds = other.home_odds
+                self.away_odds_provider = other.home_odds_provider
         self.arb = ac.get_arb_percentage(self.home_odds, self.tie_odds, self.away_odds)
 
     def tostring(self):
