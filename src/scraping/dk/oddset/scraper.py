@@ -6,7 +6,6 @@ import bets.Bet as Bet
 
 def get_oddset():
     bets = {}
-    url = 'https://content.sb.danskespil.dk/content-service/api/v1/q/time-band-event-list'
     payload = {
         'maxMarkets': 10,
         'marketSortsIncluded': '--,HH,HL,MR,WH',

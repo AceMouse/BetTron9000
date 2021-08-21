@@ -9,7 +9,7 @@ def get_bwin():
     bets = {}
     provider = 'Bwin'
 
-    from_date = datetime.today() + timedelta(days=1)
+    from_date = datetime.today() #+ timedelta(days=1)
     from_string = from_date.date().strftime('%Y-%m-%d')
     to_date = from_date + timedelta(days=1)
     to_string = to_date.date().strftime('%Y-%m-%d')
@@ -50,7 +50,15 @@ def get_bwin():
         if JSON['fixtures'][0]['startDate'] != datetime.today().strftime('%Y-%m-%d') + 'T22:00:00Z':
             print(f'please get {provider} at: ' + url)
             print('manually save it to: ' + path)
-            exit(1)
+            if input('continue program?') == '':
+                with open(path) as ff:
+                    JSON = json.load(ff)
+                    if JSON['fixtures'][0]['startDate'] == datetime.today().strftime('%Y-%m-%d') + 'T22:00:00Z':
+                        print(f'getting {provider} locally: ' + path)
+                    else:
+                        return {}
+            else:
+                exit(1)
         else:
             print(f'getting {provider} locally: ' + path)
 
