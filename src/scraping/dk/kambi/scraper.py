@@ -45,7 +45,7 @@ def get_kambi(provider, provider_url):
                           provider, provider, provider,
                           time)
             bets[bet.__hash__()] = bet
-        print('Events total: ' + str(len(JSON['events'])))
+        print('Events total: ' + str(len(bets)))
         print('success')
         return bets
     else:

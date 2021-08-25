@@ -42,26 +42,28 @@ def get_oddset():
                     tie_odds = '0'
                     home_odds = '0'
                     away_odds = '0'
-                    for i in event['markets'][0]['outcomes']:
-                        if len(i['prices']) == 1:
-                            if i['subType'] == 'H':
-                                home_odds = str(i['prices'][0]['decimal'])
-                            elif i['subType'] == 'A':
-                                away_odds = str(i['prices'][0]['decimal'])
-                            else:
-                                tie_odds = str(i['prices'][0]['decimal'])
-                    bet = Bet.Bet(home_name.replace(" (k)", '').replace(" (W)", ''),
-                                  away_name.replace(' (k)', '').replace(" (W)", ''),
+                    for market in event['markets']:
+                        if market['name'] == 'Match Winner' and market['active']:
+                            for i in market['outcomes']:
+                                if len(i['prices']) == 1:
+                                    if i['subType'] == 'H':
+                                        home_odds = str(i['prices'][0]['decimal'])
+                                    elif i['subType'] == 'A':
+                                        away_odds = str(i['prices'][0]['decimal'])
+                                    else:
+                                        tie_odds = str(i['prices'][0]['decimal'])
+                        break
+                    bet = Bet.Bet(home_name, away_name,
                                   home_odds, tie_odds, away_odds,
                                   provider, provider, provider,
                                   time)
                     bets[bet.__hash__()] = bet
-                print('Events total: ' + str(len(item['events'])))
+                print('Events total: ' + str(len(bets)))
                 print('success')
                 return bets
     else:
         print('request failure')
-        return set()
+        return {}
 
 
 

@@ -61,6 +61,7 @@ def get_bwin():
                 exit(1)
         else:
             print(f'getting {provider} locally: ' + path)
+            print(f'please get {provider} online at: ' + url)
 
     for fixture in JSON['fixtures']:
         if fixture['fixtureType'] != 'PairGame':
@@ -78,20 +79,20 @@ def get_bwin():
             continue
 
         time = datetime.strptime(fixture['startDate'], '%Y-%m-%dT%H:%M:%SZ') + timedelta(hours=2)
-        tie_odds = 0
-        home_odds = 0
-        away_odds = 0
+        tie_odds = '0'
+        home_odds = '0'
+        away_odds = '0'
         for market in fixture['optionMarkets']:
             if market['name']['value'] == 'Match Result':
                 for option in market['options']:
                     if option['name']['value'] == 'X':
-                        tie_odds = float(option['price']['odds'])
+                        tie_odds = str(option['price']['odds'])
                     elif option['name']['value'].replace(' (Women) (Women)', ' (Women)') == home_name:
-                        home_odds = float(option['price']['odds'])
+                        home_odds = str(option['price']['odds'])
                     elif option['name']['value'].replace(' (Women) (Women)', ' (Women)') == away_name:
-                        away_odds = float(option['price']['odds'])
+                        away_odds = str(option['price']['odds'])
                 break
-        if home_odds == 0 or away_odds == 0:
+        if home_odds == '0' or away_odds == '0':
             continue
         bet = Bet.Bet(home_name, away_name,
                       home_odds, tie_odds, away_odds,
