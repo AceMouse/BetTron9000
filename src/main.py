@@ -4,33 +4,51 @@ import scraping.dk.sport888.scraper as sport888
 import scraping.dk.mr_green.scraper as mr_green
 import scraping.dk.leo_vegas.scraper as leo_vegas
 import scraping.dk.bwin.scraper as bwin
+import scraping.dk.bet25.scraper as bet25
+import scraping.dk.betstars.scraper as betstars
+import scraping.dk.zigzag_sport.scraper as zigzag_sport
+import time
+import winsound
+import datetime
 
 
 def run_scrapers():
-    bets1 = oddset.get_oddset()
-    bets2 = unibet.get_unibet()
-    bets3 = sport888.get_sport888()
-    bets4 = mr_green.get_mr_green()
-    bets5 = leo_vegas.get_leo_vegas()
-    bets6 = bwin.get_bwin()
-    merge(bets1, bets2)
-    merge(bets1, bets3)
-    merge(bets1, bets4)
-    merge(bets1, bets5)
-    merge(bets1, bets6)
-    return bets1.values()
+    bets = oddset.get_oddset()
+    merge(bets, unibet.get_unibet())
+    merge(bets, sport888.get_sport888())
+    merge(bets, mr_green.get_mr_green())
+    merge(bets, leo_vegas.get_leo_vegas())
+    merge(bets, bwin.get_bwin())
+    merge(bets, bet25.get_bet25())
+    merge(bets, betstars.get_betstars())
+    merge(bets, zigzag_sport.get_zigzag_sport())
+    return bets.values()
 
 
 def merge(bets1, bets2):
     for key in bets2.keys():
         if key in bets1.keys():
-            bets1.get(key).merge(bets2.get(key))
+            bets1[key].merge(bets2[key])
+        else:
+            bets1[key] = bets2[key]
 
 
-bets = list(run_scrapers())
-bets.sort()
-bets.reverse()
-for bet in bets:
-    print()
-    print(bet.tostring())
-    print()
+start_date = datetime.date.today()
+while start_date == datetime.date.today():
+    bets = list(run_scrapers())
+    bets.sort()
+    bets.reverse()
+    for bet in bets:
+        print()
+        print(bet.tostring())
+        print()
+
+    print(f'Total bets: {len(bets)}')
+    duration = 500  # milliseconds
+    freq = 440  # Hz
+    if bets[-1].arb < 100:
+        winsound.Beep(freq, duration)
+        time.sleep(1)
+        winsound.Beep(freq, duration)
+
+    time.sleep(60 * 60)
