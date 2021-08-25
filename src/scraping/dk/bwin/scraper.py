@@ -93,8 +93,7 @@ def get_bwin():
                 break
         if home_odds == 0 or away_odds == 0:
             continue
-        bet = Bet.Bet(home_name.replace(' (k)', '').replace(" (W)", '').replace(' (Women)', ''),
-                      away_name.replace(' (k)', '').replace(" (W)", '').replace(' (Women)', ''),
+        bet = Bet.Bet(home_name, away_name,
                       home_odds, tie_odds, away_odds,
                       provider, provider, provider,
                       time)
