@@ -40,14 +40,41 @@ class Bet:
         self.arb = ac.get_arb_percentage(self.home_odds, self.tie_odds, self.away_odds)
 
     def sanitize(self, original_name):
-        name = re.sub(r'\s?((VMFD)|(A\.Ş\.)|(\(GUA\))|(\(KSA\))|(ZSC)|(HSK)|(HJK)|(PFC)|(PFK)|(RFK)|(MFK)|(CSD)|(CSM)|(OFK)|(OfK)|(Ofk)|(FSV)|(NK)|(CS)|(SP)|(FC)|(AP)|(EC)|(FH)|(RB)|(BA)|(AD)|(SV)|(SK)|(SC)|(AC)|(IFK)|(BK)|(IK)|(IF)|(1\.)|(FK)|(FV)|(TSV)|(TSG)|(TJ)|(CA)|(JK)|(CD))\s?', '', re.sub(r'St\.', 'St', re.sub(r'\s?\(((W(omen)?)|(k)|(Reserves))\)', '', original_name.replace('HIFK', 'Helsinki'))).replace('Utd', 'United').replace('F.C.', 'FC'))
-        name = name.replace('/', ' ').replace('Ž', 'Z').replace('ı', 'u').replace('ç', 'ch').replace('Š', 'S').replace('Á', 'A').replace('š', 's').replace('ă', 'a').replace('ș', 's').replace('ß', 'ss').replace('Lok.', 'Lokomotiva').replace('â', 'a').replace('ø', 'o').replace('Ñ', 'N').replace('ü', 'u').replace('å', 'aa').replace('é', 'e').replace('Ö', 'O').replace('á', 'a').replace('-', ' ').replace('ö', 'o').replace('ó', ' ').replace('ä', 'a').replace('Í', 'I').replace('í', 'i').replace('ú', 'u').replace('Â', '').replace('\'', '').replace('´', '').replace('ñ', 'n')
+        name = re.sub(r'\s?((VMFD)|(F\.C\.)|(A\.Ş\.)|(\(PER\))|(\(GUA\))|(\(KSA\))|(EHC)|(ZSC)|(HSK)|(HJK)|(AFC)|(PFC)|(PFK)|(RFK)|(MFK)|(CSD)|(CSM)|(OFK)|(OfK)|(Ofk)|(FSV)|(NK)|(CS)|(SP)|(FC)|(AP)|(EC)|(FH)|(RB)|(BA)|(AD)|(SV)|(SK)|(SC)|(AC)|(IFK)|(BK)|(IK)|(IF)|(1\.)|(FK)|(FV)|(TSV)|(TSG)|(TJ)|(CA)|(JK)|(CD))\s?', '', re.sub(r'St\.', 'St', re.sub(r'\s?\(?((W(omen)?)|(k)|([Rr]eserves))\)?', '', original_name.replace('HIFK', 'Helsinki'))).replace('Utd', 'United'))
+        name = name.replace('/', ' ').replace('Ž', 'Z').replace('ı', 'u').replace('ç', 'ch').replace('Š', 'S').replace('Á', 'A').replace('š', 's').replace('ă', 'a').replace('ș', 's').replace('ß', 'ss').replace('Lok.', 'Lokomotiva').replace('â', 'a').replace('ø', 'o').replace('Ñ', 'N').replace('ü', 'u').replace('å', 'aa').replace('é', 'e').replace('Ö', 'O').replace('á', 'a').replace('-', ' ').replace('ö', 'o').replace('ó', 'o').replace('ä', 'a').replace('Í', 'I').replace('í', 'i').replace('ú', 'u').replace('Â', '').replace('\'', '').replace('´', '').replace('ñ', 'n')
         if ',' in name:
             x = name.split(', ')
             name = x[-1] + ' ' + x[0]
         synonym_table = {'Schweiz': 'Switzerland',
+                         'SonderjyskE': 'Sonderjyske',
+                         'Munchen': 'Red Bull Munchen',
+                         'Grecia': 'Municipal Grecia',
+                         'Alajuelense': 'Liga Deportiva Alajuelense',
+                         'LD Alajuelense': 'Liga Deportiva Alajuelense',
+                         'East Riffa Club': 'East Riffa',
+                         'Manama': 'Al Manama',
+                         'Budaiya': 'Al Budaiya',
+                         'AL Budaiya': 'Al Budaiya',
+                         'Godoy Cruz': 'Godoy Cruz Antonio Tomba',
+                         'AlianzaSan Salvador': 'Alianza',
+                         'AL Khalidiyah': 'Al Khalidiyah',
+                         'Rionegro Aguilas': 'Rionegro Aguilas Doradas',
+                         'Rionegro': 'Rionegro Aguilas Doradas',
+                         'Tolima': 'Deportes Tolima',
+                         'Molinos El Pirata': 'Pirata',
                          'Helsinki Helsinki': 'Helsinki',
                          'Lions Zurich': 'Lions',
+                         'Juan Aurich de Chiclayo': 'Juan Aurich',
+                         'Llacuabamba': 'Deportivo Llacuabamba',
+                         'Andijon': 'Andijan',
+                         'Club Fernando De La Mora': 'Fernando de La Mora',
+                         'Club Fernando de La Mora': 'Fernando de La Mora',
+                         '3 de FebreroE': '3 de Febrero',
+                         'Progresul Spartac 1944': 'Progresul 1944 Spartac',
+                         'Ordabasy': 'Ordabasy Shymkent',
+                         'SantosNasca': 'Santos Nasca',
+                         'Santos': 'Santos Nasca',
+                         'Kyzylzhar': 'Kyzylzhar Petropavlosvk',
                          'Athletico Paranaense PR': 'Paranaense',
                          'Athletico PR': 'Paranaense',
                          'Paranaense PR': 'Paranaense',
@@ -80,6 +107,7 @@ class Bet:
                          'Manama Club': 'Al Manama',
                          'Victoria': 'Victoria La Ceiba',
                          'FAS': 'FAS Santa Ana',
+                         'Fas': 'FAS Santa Ana',
                          'Slovakiet': 'Slovakia',
                          'Østrig': 'Austria',
                          'Kansas City NWSL': 'Kansas City',
