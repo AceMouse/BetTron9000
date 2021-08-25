@@ -44,6 +44,7 @@ while start_date == datetime.date.today():
         print()
 
     print(f'Total bets: {len(bets)}')
+    print('last scrape at: ' + str(datetime.datetime.now()))
     duration = 500  # milliseconds
     freq = 440  # Hz
     if bets[-1].arb < 100:
