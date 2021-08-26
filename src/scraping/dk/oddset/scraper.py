@@ -39,6 +39,7 @@ def get_oddset():
                         home_name = event['teams'][1]['name']
                         away_name = event['teams'][0]['name']
                     time = datetime.strptime(event['startTime'], '%Y-%m-%dT%H:%M:%SZ') + timedelta(hours=2)
+                    sport = event['category']['name']
                     tie_odds = '0'
                     home_odds = '0'
                     away_odds = '0'
@@ -56,7 +57,7 @@ def get_oddset():
                     bet = Bet.Bet(home_name, away_name,
                                   home_odds, tie_odds, away_odds,
                                   provider, provider, provider,
-                                  time)
+                                  time, sport)
                     bets[bet.__hash__()] = bet
                 print('Events total: ' + str(len(bets)))
                 print('success')

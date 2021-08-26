@@ -52,7 +52,7 @@ def get_betstars():
                 bet = Bet.Bet(home_name, away_name,
                               home_odds, tie_odds, away_odds,
                               provider, provider, provider,
-                              start_time)
+                              start_time, sport)
                 bets[bet.__hash__()] = bet
         else:
             print('request failure')
