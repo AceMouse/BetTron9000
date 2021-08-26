@@ -47,13 +47,14 @@ def get_bwin():
     path = 'C:\\Users\\asmus\\programing\\odds_comparator\\resourses\\bwin.json'
     with open(path) as f:
         JSON = json.load(f)
-        if JSON['fixtures'][0]['startDate'] != datetime.today().strftime('%Y-%m-%d') + 'T22:00:00Z':
+        check_date = datetime.strptime(from_string, '%Y-%m-%d') + timedelta(hours=22) #datetime(year=datetime.today().year, month=datetime.today().month, day=datetime.today().day, hour=22)
+        if datetime.strptime(JSON['fixtures'][0]['startDate'], '%Y-%m-%dT%H:%M:%SZ') < check_date:
             print(f'please get {provider} at: ' + url)
             print('manually save it to: ' + path)
             if input('continue program?') == '':
                 with open(path) as ff:
                     JSON = json.load(ff)
-                    if JSON['fixtures'][0]['startDate'] == datetime.today().strftime('%Y-%m-%d') + 'T22:00:00Z':
+                    if datetime.strptime(JSON['fixtures'][0]['startDate'], '%Y-%m-%dT%H:%M:%SZ') >= check_date:
                         print(f'getting {provider} locally: ' + path)
                     else:
                         return {}
