@@ -31,7 +31,7 @@ def get_betstars():
                 else:
                     home_name = event['participants']['participant'][1]['name']
                     away_name = event['participants']['participant'][0]['name']
-                start_time = event['eventTime']
+                start_time = datetime(year=2021, month=8, day=27, hour=1, minute=15) + timedelta(milliseconds=event['eventTime']-1630019700000)
                 tie_odds = '0'
                 home_odds = '0'
                 away_odds = '0'
