@@ -2,7 +2,6 @@ import json
 import requests
 import bets.Bet as Bet
 from datetime import datetime, timedelta
-import time
 
 
 def get_betstars():
@@ -31,7 +30,7 @@ def get_betstars():
                 else:
                     home_name = event['participants']['participant'][1]['name']
                     away_name = event['participants']['participant'][0]['name']
-                start_time = datetime(year=2021, month=8, day=27, hour=1, minute=15) + timedelta(milliseconds=event['eventTime']-1630019700000)
+                time = datetime(year=2021, month=8, day=27, hour=1, minute=15) + timedelta(milliseconds=event['eventTime']-1630019700000)
                 tie_odds = '0'
                 home_odds = '0'
                 away_odds = '0'
@@ -52,7 +51,7 @@ def get_betstars():
                 bet = Bet.Bet(home_name, away_name,
                               home_odds, tie_odds, away_odds,
                               provider, provider, provider,
-                              start_time, sport)
+                              time, sport)
                 bets[bet.__hash__()] = bet
         else:
             print('request failure')
