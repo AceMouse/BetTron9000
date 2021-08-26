@@ -1,10 +1,10 @@
 import util.arb_calculator as ac
 import re
 
-class Bet:
 
+class Bet:
     def __init__(self, home_name, away_name, home_odds, tie_odds, away_odds, home_odds_provider, tie_odds_provider,
-                 away_odds_provider, time):
+                 away_odds_provider, time, sport=''):
         self.home_name = self.sanitize(home_name)
         self.away_name = self.sanitize(away_name)
         self.home_odds = home_odds
@@ -15,6 +15,7 @@ class Bet:
         self.tie_odds_provider = tie_odds_provider
         self.time = time
         self.arb = ac.get_arb_percentage(home_odds, tie_odds, away_odds)
+        self.sport = sport
 
     def merge(self, other):
         if self.home_name.lower() == other.home_name.lower():
@@ -38,14 +39,55 @@ class Bet:
                 self.away_odds = other.home_odds
                 self.away_odds_provider = other.home_odds_provider
         self.arb = ac.get_arb_percentage(self.home_odds, self.tie_odds, self.away_odds)
+        if len(other.sport) > len(self.sport):
+            self.sport = other.sport
 
     def sanitize(self, original_name):
-        name = re.sub(r'\s?((VMFD)|(F\.C\.)|(A\.Ş\.)|(\(PER\))|(\(GUA\))|(\(KSA\))|(EHC)|(ZSC)|(HSK)|(HJK)|(AFC)|(PFC)|(PFK)|(RFK)|(MFK)|(CSD)|(CSM)|(OFK)|(OfK)|(Ofk)|(FSV)|(NK)|(CS)|(SP)|(FC)|(AP)|(EC)|(FH)|(RB)|(BA)|(AD)|(SV)|(SK)|(SC)|(AC)|(IFK)|(BK)|(IK)|(IF)|(1\.)|(FK)|(FV)|(TSV)|(TSG)|(TJ)|(CA)|(JK)|(CD))\s?', '', re.sub(r'St\.', 'St', re.sub(r'\s?\(?((W(omen)?)|(k)|([Rr]eserves))\)?', '', original_name.replace('HIFK', 'Helsinki'))).replace('Utd', 'United'))
-        name = name.replace('/', ' ').replace('Ž', 'Z').replace('ı', 'u').replace('ç', 'ch').replace('Š', 'S').replace('Á', 'A').replace('š', 's').replace('ă', 'a').replace('ș', 's').replace('ß', 'ss').replace('Lok.', 'Lokomotiva').replace('â', 'a').replace('ø', 'o').replace('Ñ', 'N').replace('ü', 'u').replace('å', 'aa').replace('é', 'e').replace('Ö', 'O').replace('á', 'a').replace('-', ' ').replace('ö', 'o').replace('ó', 'o').replace('ä', 'a').replace('Í', 'I').replace('í', 'i').replace('ú', 'u').replace('Â', '').replace('\'', '').replace('´', '').replace('ñ', 'n')
+        name = re.sub(
+            r'\s?((VMFD)|(F\.C\.)|(A\.Ş\.)|(C\.A\.)|(\(PER\))|(\(ARG\))|(\(GUA\))|(\(KSA\))|(PSV)|(RKC)|(EHC)|(ZSC)|(HSK)|(HJK)|(AFC)|(PFC)|(PFK)|(RFK)|(MFK)|(CSD)|(CSM)|(OFK)|(OfK)|(Ofk)|(FSV)|(HC)|(NK)|(CS)|(SP)|(SA)|(FC)|(AP)|(EC)|(FH)|(RB)|(BA)|(AD)|(SV)|(SK)|(SC)|(AC)|(IFK)|(BK)|(IK)|(IF)|(1\.)|(FK)|(FV)|(TSV)|(TSG)|(TJ)|(CA)|(JK)|(CD))\s?',
+            '', re.sub(r'St\.', 'St', re.sub(r'\s?\(((W(omen)?)|(k)|(Youth)|([Rr]eserves))\)', '',
+                                             original_name.replace('HIFK', 'Helsinki'))).replace('Utd',
+                                                                                                 'United')).replace(
+            'Lokomotive', 'Lokomotiv')
+        name = name.replace('ń', 'n').replace('Ç', 'C').replace('ł', 'l').replace('/', ' ').replace('Ž', 'Z').replace(
+            'ı', 'u').replace('ç', 'ch').replace('&', 'and').replace('Š', 'S').replace('Á', 'A').replace('š',
+                                                                                                         's').replace(
+            'ă', 'a').replace('ș', 's').replace('ş', 's').replace('ß', 'ss').replace('Lok.', 'Lokomotiv').replace('â',
+                                                                                                                   'a').replace(
+            'ø', 'o').replace('Ñ', 'N').replace('ü', 'u').replace('å', 'a').replace('é', 'e').replace('Ö',
+                                                                                                       'O').replace('á',
+                                                                                                                    'a').replace(
+            '-', ' ').replace('ö', 'o').replace('ó', 'o').replace('ä', 'a').replace('Í', 'I').replace('í', 'i').replace(
+            'ú', 'u').replace('Â', '').replace('\'', '').replace('´', '').replace('ñ', 'n')
         if ',' in name:
             x = name.split(', ')
             name = x[-1] + ' ' + x[0]
         synonym_table = {'Schweiz': 'Switzerland',
+                         'Skelleftea A': 'Skelleftea',
+                         'Cienciano Cusco': 'Cienciano',
+                         'Zalaegerszeg TE': 'Zalaegerszeg',
+                         'Zalaegerszegi TE': 'Zalaegerszeg',
+                         'Budapest Honved': 'Honved',
+                         'Caykur Rizespor': 'Rizespor',
+                         'Lokomotiv 1929 Sofia': 'Lokomotiv Sofia',
+                         'Lokomotiv Sofia 1929': 'Lokomotiv Sofia',
+                         'Everton de Vina del Mar': 'Everton Vina del Mar',
+                         'Dynamo Moskva': 'Dynamo Moscow',
+                         'O Higgins': 'OHiggins',
+                         'Aldosivi Mar del Plata': 'Aldosivi',
+                         'KS Warta Posen': 'Warta Poznan',
+                         'KS Warta Poznan': 'Warta Poznan',
+                         'BW Linz': 'Blau Weiss Linz',
+                         'US Boulogne': 'Boulogne',
+                         'Jong Ajax': 'Ajax',
+                         'Ajax Amsterdam': 'Ajax',
+                         'FaZe Clan': 'FaZe',
+                         'Faze Clan': 'FaZe',
+                         'Faze': 'FaZe',
+                         'Birmingham Bears': 'Birmingham',
+                         'Olimpiyets Nizhny Novgorod': 'Nizhny Novgorod',
+                         'Excelsior Rotterdam': 'Excelsior',
+                         'JongEindhoven': 'Eindhoven',
                          'SonderjyskE': 'Sonderjyske',
                          'Munchen': 'Red Bull Munchen',
                          'Grecia': 'Municipal Grecia',
@@ -53,8 +95,29 @@ class Bet:
                          'LD Alajuelense': 'Liga Deportiva Alajuelense',
                          'East Riffa Club': 'East Riffa',
                          'Manama': 'Al Manama',
+                         'KV Mechelen': 'Mechelen',
+                         'Yellow Red KV Mechelen': 'Mechelen',
+                         'Yellow RedMechelen': 'Mechelen',
+                         'Esbjerg FB': 'Esbjerg',
+                         'Esbjerg fB': 'Esbjerg',
+                         'Shakhtyor Soligorsk': 'Shakhter Soligorsk',
+                         'Ruh Brest': 'Rukh Brest',
+                         'Sandhausen 1916': 'Sandhausen',
+                         'Ingolstadt 04': 'Ingolstadt',
+                         'Cheltenham Town': 'Cheltenham',
+                         'Burton': 'Burton Albion',
+                         'Football Bourg En Bresse Peronnas 01': 'Bourg Peronnas',
+                         'US Avranches': 'Avranches',
+                         'Venlo': 'VVV Venlo',
+                         'AZ(Youth)': 'Jong AZ Almaar',
+                         'Nuova Cosenza Calcio': 'Cosenza',
                          'Budaiya': 'Al Budaiya',
+                         'Arda Kardzhali': 'Arda',
+                         'Loomotiv 1929 Sofia': 'Loomotiv Sofia',
+                         'Loomotiv Sofia 1929': 'Loomotiv Sofia',
                          'AL Budaiya': 'Al Budaiya',
+                         'KA 1948': 'KA 1948 Sofia',
+                         'Slaviya Sofia': 'Slavia Sofia',
                          'Godoy Cruz': 'Godoy Cruz Antonio Tomba',
                          'AlianzaSan Salvador': 'Alianza',
                          'AL Khalidiyah': 'Al Khalidiyah',
@@ -317,12 +380,23 @@ class Bet:
                          'Enkoping': 'Enkopings',
                          'Täfteå': 'Taftea',
                          'VfL Osnabruck': 'VfL 1899 Osnabruck',
-                         'Osnabruck': 'VfL 1899 Osnabruck'
+                         'Osnabruck': 'VfL 1899 Osnabruck',
+                         'Graafschap': 'De Graafschap',
+                         'Dortmund': 'Borussia Dortmund',
+                         'Alaves': 'Deportivo Alaves',
+                         'Verona': 'Hellas Verona',
+                         'Inter': 'Inter Milan',
+                         'Internazionale': 'Inter Milan',
+                         'Colchester': 'Colchester United',
+                         'AaB': 'AaB Aalborg',
+                         'T1 Gaming': 'T1'
                          }
         return synonym_table.get(name, name)
 
     def tostring(self):
         s = str(self.time) + '\n' + 'HOME: ' + self.home_name + ' vs AWAY: ' + self.away_name + '\n'
+        if self.sport != '':
+            s += 'Sport:' + self.sport + '\n'
         if self.tie_odds == '0':
             s += '2 outcomes: HOME: ' + self.home_odds_provider + ' vs AWAY: ' + self.away_odds_provider + '\n'
             s += '            HOME: ' + str(self.home_odds) + ' vs AWAY: ' + str(self.away_odds)
@@ -343,4 +417,4 @@ class Bet:
         return self.arb <= other.arb
 
     def __hash__(self):
-        return int(self.home_name.lower().__hash__() + self.away_name.lower().__hash__())# + self.time.__hash__())
+        return int(self.home_name.lower().__hash__() + self.away_name.lower().__hash__() + self.time.__hash__())
