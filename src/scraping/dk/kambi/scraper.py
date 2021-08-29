@@ -5,7 +5,8 @@ from datetime import datetime, timedelta
 
 
 def get_kambi(provider, provider_url):
-    bets = {}
+    bets = dict()
+    total_bets = 0
     from_date = datetime.today()+timedelta(days=1)
     from_string = from_date.date().strftime('%Y%m%d')
     to_date = from_date+timedelta(days=1)
@@ -40,12 +41,18 @@ def get_kambi(provider, provider_url):
                 away_odds = event['betOffers'][0]['outcomes'][-1]['odds'] / 1000
             except:
                 continue
-            bet = Bet.Bet(home_name, away_name,
-                          home_odds, tie_odds, away_odds,
-                          provider, provider, provider,
-                          time)
-            bets[bet.__hash__()] = bet
-        print('Events total: ' + str(len(bets)))
+            if bets.get(str(time)) is None:
+                bets[str(time)] = []
+            bets[str(time)].append(
+                Bet.Bet(
+                    home_name, away_name,
+                    home_odds, tie_odds, away_odds,
+                    provider, provider, provider,
+                    time
+                )
+            )
+            total_bets += 1
+        print('Events total: ' + str(total_bets))
         print('success')
         return bets
     else:

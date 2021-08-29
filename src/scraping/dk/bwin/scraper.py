@@ -6,7 +6,8 @@ from datetime import datetime, timedelta
 
 
 def get_bwin():
-    bets = {}
+    bets = dict()
+    total_bets = 0
     provider = 'Bwin'
 
     from_date = datetime.today() #+ timedelta(days=1)
@@ -95,12 +96,18 @@ def get_bwin():
                 break
         if home_odds == '0' or away_odds == '0':
             continue
-        bet = Bet.Bet(home_name, away_name,
-                      home_odds, tie_odds, away_odds,
-                      provider, provider, provider,
-                      time)
-        bets[bet.__hash__()] = bet
-    print('Events total: ' + str(len(JSON['fixtures'])))
+        if bets.get(str(time)) is None:
+            bets[str(time)] = []
+        bets[str(time)].append(
+            Bet.Bet(
+                home_name, away_name,
+                home_odds, tie_odds, away_odds,
+                provider, provider, provider,
+                time
+            )
+        )
+        total_bets += 1
+    print('Events total: ' + str(total_bets))
     print('success')
     return bets
 '''

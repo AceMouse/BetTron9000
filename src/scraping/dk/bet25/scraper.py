@@ -5,7 +5,8 @@ from datetime import datetime, timedelta
 
 
 def get_bet25():
-    bets = {}
+    bets = dict()
+    total_bets = 0
     provider = 'Bet25'
     request = requests.get('https://www.bet25.dk/rest/sports/events/hours/48')
     print(f'getting {provider}: ' + request.url)
@@ -34,12 +35,18 @@ def get_bet25():
                     break
             if home_odds == '0' or away_odds == '0':
                 continue
-            bet = Bet.Bet(home_name, away_name,
-                          home_odds, tie_odds, away_odds,
-                          provider, provider, provider,
-                          time)
-            bets[bet.__hash__()] = bet
-        print('Events total: ' + str(len(bets)))
+            if bets.get(str(time)) is None:
+                bets[str(time)] = []
+            bets[str(time)].append(
+                Bet.Bet(
+                    home_name, away_name,
+                    home_odds, tie_odds, away_odds,
+                    provider, provider, provider,
+                    time
+                )
+            )
+            total_bets += 1
+        print('Events total: ' + str(total_bets))
         print('success')
         return bets
     else:

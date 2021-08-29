@@ -5,7 +5,8 @@ from datetime import datetime, timedelta
 
 
 def get_betstars():
-    bets = {}
+    bets = dict()
+    total_bets = 0
     date = datetime.today() + timedelta(days=1)
     date_str = date.date().strftime('%Y-%m-%d')
     provider = 'Betstars'
@@ -48,14 +49,20 @@ def get_betstars():
                         break
                 if home_odds == '0' or away_odds == '0':
                     continue
-                bet = Bet.Bet(home_name, away_name,
-                              home_odds, tie_odds, away_odds,
-                              provider, provider, provider,
-                              time, sport)
-                bets[bet.__hash__()] = bet
+                if bets.get(str(time)) is None:
+                    bets[str(time)] = []
+                bets[str(time)].append(
+                    Bet.Bet(
+                        home_name, away_name,
+                        home_odds, tie_odds, away_odds,
+                        provider, provider, provider,
+                        time, sport
+                    )
+                )
+                total_bets += 1
         else:
             print('request failure')
             continue
-    print('Events total: ' + str(len(bets)))
+    print('Events total: ' + str(total_bets))
     print('success')
     return bets
