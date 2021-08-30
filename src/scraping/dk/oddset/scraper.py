@@ -25,6 +25,7 @@ def get_oddset():
         'includeCommentary': 'true',
         'includeIncidents': 'true',
         'includeMedia': 'true',
+        'lang': 'en'
     }
     request = requests.get('https://content.sb.danskespil.dk/content-service/api/v1/q/event-list', params=payload)
     provider = "Oddset"
