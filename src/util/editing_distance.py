@@ -16,7 +16,7 @@ def _get_edit_distance(A, B):
 
 
 def is_similar(A, B):
-    return _get_edit_distance(A, B) < ((len(A)+len(B))/2)*0.6
+    return _get_edit_distance(A, B) < ((len(A)+len(B))/2)*0.4
 
 
 
