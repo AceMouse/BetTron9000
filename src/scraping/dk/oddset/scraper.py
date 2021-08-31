@@ -4,12 +4,12 @@ import requests
 import bets.Bet as Bet
 
 
-def get_oddset():
+def get_oddset(days=1):
     bets = dict()
     total_bets = 0
     from_date = datetime.today()
     from_string = from_date.date().strftime('%Y-%m-%d') + 'T22:00:00Z'
-    to_date = from_date+timedelta(days=1)
+    to_date = from_date+timedelta(days=days)
     to_string = to_date.date().strftime('%Y-%m-%d') + 'T21:59:59Z'
     payload = {
         'startTimeFrom': from_string,

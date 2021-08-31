@@ -4,57 +4,58 @@ import bets.Bet as Bet
 from datetime import datetime, timedelta
 
 
-def get_kambi(provider, provider_url):
+def get_kambi(provider, provider_url, days):
     bets = dict()
     total_bets = 0
-    from_date = datetime.today()+timedelta(days=1)
-    from_string = from_date.date().strftime('%Y%m%d')
-    to_date = from_date+timedelta(days=1)
-    to_string = to_date.date().strftime('%Y%m%d')
-    payload = {
-        'lang': 'en_GB',
-        'market': 'DK',
-        'client_id': '2',
-        'channel_id': '1',
-        'ncid': '1629387795925',
-        'useCombined': 'true',
-        'from': from_string + 'T000000+0200',
-        'to': to_string + 'T000000+0200'
-    }
-    request = requests.get(
-        'https://eu-offering.kambicdn.org/offering/v2018/'+provider_url+'/listView/all/all/all/all/starting-within.json',
-        params=payload)
-    print(f'getting {provider}: ' + request.url)
-    if request.ok:
-        JSON = json.loads(request.text)
-        for event in JSON['events']:
-            if 'awayName' not in event['event'] or 'homeName' not in event['event']:
-                continue
-            home_name = event['event']['homeName']
-            away_name = event['event']['awayName']
-            time = datetime.strptime(event['event']['start'], '%Y-%m-%dT%H:%M:%SZ') + timedelta(hours=2)
-            try:
-                home_odds = event['betOffers'][0]['outcomes'][0]['odds'] / 1000
-                tie_odds = '0'
-                if len(event['betOffers'][0]['outcomes']) == 3:
-                    tie_odds = event['betOffers'][0]['outcomes'][1]['odds'] / 1000
-                away_odds = event['betOffers'][0]['outcomes'][-1]['odds'] / 1000
-            except:
-                continue
-            if bets.get(str(time)) is None:
-                bets[str(time)] = []
-            bets[str(time)].append(
-                Bet.Bet(
-                    home_name, away_name,
-                    home_odds, tie_odds, away_odds,
-                    provider, provider, provider,
-                    time
+    from_date = datetime.today()
+    for _ in range(days):
+        from_date += timedelta(days=1)
+        from_string = from_date.date().strftime('%Y%m%d')
+        to_date = from_date+timedelta(days=1)
+        to_string = to_date.date().strftime('%Y%m%d')
+        payload = {
+            'lang': 'en_GB',
+            'market': 'DK',
+            'client_id': '2',
+            'channel_id': '1',
+            'ncid': '1629387795925',
+            'useCombined': 'true',
+            'from': from_string + 'T000000+0200',
+            'to': to_string + 'T000000+0200'
+        }
+        request = requests.get(
+            'https://eu-offering.kambicdn.org/offering/v2018/'+provider_url+'/listView/all/all/all/all/starting-within.json',
+            params=payload)
+        print(f'getting {provider}: ' + request.url)
+        if request.ok:
+            JSON = json.loads(request.text)
+            for event in JSON['events']:
+                if 'awayName' not in event['event'] or 'homeName' not in event['event']:
+                    continue
+                home_name = event['event']['homeName']
+                away_name = event['event']['awayName']
+                time = datetime.strptime(event['event']['start'], '%Y-%m-%dT%H:%M:%SZ') + timedelta(hours=2)
+                try:
+                    home_odds = event['betOffers'][0]['outcomes'][0]['odds'] / 1000
+                    tie_odds = '0'
+                    if len(event['betOffers'][0]['outcomes']) == 3:
+                        tie_odds = event['betOffers'][0]['outcomes'][1]['odds'] / 1000
+                    away_odds = event['betOffers'][0]['outcomes'][-1]['odds'] / 1000
+                except:
+                    continue
+                if bets.get(str(time)) is None:
+                    bets[str(time)] = []
+                bets[str(time)].append(
+                    Bet.Bet(
+                        home_name, away_name,
+                        home_odds, tie_odds, away_odds,
+                        provider, provider, provider,
+                        time
+                    )
                 )
-            )
-            total_bets += 1
-        print('Events total: ' + str(total_bets))
-        print('success')
-        return bets
-    else:
-        print('request failure')
-        return {}
+                total_bets += 1
+        else:
+            print('request failure')
+    print('Events total: ' + str(total_bets))
+    print('success')
+    return bets

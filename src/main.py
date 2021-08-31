@@ -12,15 +12,15 @@ import winsound
 import datetime
 
 
-def run_scrapers():
-    bets = oddset.get_oddset()
-    merge(bets, unibet.get_unibet())
-    merge(bets, sport888.get_sport888())
-    merge(bets, mr_green.get_mr_green())
-    merge(bets, leo_vegas.get_leo_vegas())
-    merge(bets, bwin.get_bwin())
-    merge(bets, bet25.get_bet25())
-    merge(bets, betstars.get_betstars())
+def run_scrapers(days=1):
+    bets = oddset.get_oddset(days=days)
+    merge(bets, unibet.get_unibet(days=days))
+    merge(bets, sport888.get_sport888(days=days))
+    merge(bets, mr_green.get_mr_green(days=days))
+    merge(bets, leo_vegas.get_leo_vegas(days=days))
+    merge(bets, bwin.get_bwin(days=days))
+    merge(bets, bet25.get_bet25(hours=(days+1)*24))
+    merge(bets, betstars.get_betstars(days=days))
     return bets
 
 
@@ -41,8 +41,13 @@ def merge(bets1, bets2):
 
 
 start_date = datetime.date.today()
+i = 0
 while start_date == datetime.date.today():
-    bets = run_scrapers()
+    if i % 3 == 0:
+        days = 30
+    else:
+        days = 1
+    bets = run_scrapers(days=days)
     list = []
     for bet_list in bets.values():
         list.extend(bet_list)
@@ -62,4 +67,5 @@ while start_date == datetime.date.today():
         time.sleep(1)
         winsound.Beep(freq, duration)
 
+    i += 1
     time.sleep(60 * 30)

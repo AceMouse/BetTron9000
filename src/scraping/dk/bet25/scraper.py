@@ -4,11 +4,11 @@ import bets.Bet as Bet
 from datetime import datetime, timedelta
 
 
-def get_bet25():
+def get_bet25(hours=48):
     bets = dict()
     total_bets = 0
     provider = 'Bet25'
-    request = requests.get('https://www.bet25.dk/rest/sports/events/hours/48')
+    request = requests.get('https://www.bet25.dk/rest/sports/events/hours/'+str(hours))
     print(f'getting {provider}: ' + request.url)
     if request.ok:
         JSON = json.loads(request.text)
@@ -18,8 +18,7 @@ def get_bet25():
             home_name = event['homeTeam']
             away_name = event['awayTeam']
             time = datetime.strptime(event['kickoffDate']+event['kickoffTime'], '%d.%m.%Y%H:%M')
-            if time.date() != (datetime.today()+timedelta(days=1)).date():
-                continue
+
             tie_odds = '0'
             home_odds = '0'
             away_odds = '0'

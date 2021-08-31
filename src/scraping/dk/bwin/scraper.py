@@ -5,14 +5,14 @@ import bets.Bet as Bet
 from datetime import datetime, timedelta
 
 
-def get_bwin():
+def get_bwin(days=1):
     bets = dict()
     total_bets = 0
     provider = 'Bwin'
 
     from_date = datetime.today() #+ timedelta(days=1)
     from_string = from_date.date().strftime('%Y-%m-%d')
-    to_date = from_date + timedelta(days=1)
+    to_date = from_date + timedelta(days=days)
     to_string = to_date.date().strftime('%Y-%m-%d')
     payload = {
         'x-bwin-accessid': 'MjJmMjBkY2QtZmNjOS00YjUyLTk4M2MtNzY4M2Y5NzdjNWEy',
@@ -28,7 +28,7 @@ def get_bwin():
         'regionIds': '',
         'competitionIds': '',
         'skip': '0',
-        'take': '2000',
+        'take': '20000',
         'sortBy': 'StartDate',
         'from': from_string + 'T22:00:00.000Z',
         'to': to_string + 'T22:00:00.000Z'
