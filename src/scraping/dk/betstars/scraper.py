@@ -14,9 +14,8 @@ def get_betstars(days=1):
               'GOLF', 'RALLY', 'MOTOR_SPORTS', 'PESAPALLO', 'RUGBY_LEAGUE', 'RUGBY_UNION', 'SNOOKER', 'BEACH_SOCCER',
               'VOLLEYBALL']
     for _ in range(days):
-        date += timedelta(days=1)
         date_str = date.date().strftime('%Y-%m-%d')
-
+        date += timedelta(days=1)
 
         for sport in sports:
             request = requests.get(

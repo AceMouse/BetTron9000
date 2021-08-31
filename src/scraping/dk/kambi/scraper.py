@@ -7,12 +7,14 @@ from datetime import datetime, timedelta
 def get_kambi(provider, provider_url, days):
     bets = dict()
     total_bets = 0
-    from_date = datetime.today()
+    from_date = datetime.now() + timedelta(hours=2)
     for _ in range(days):
+        from_string = from_date.strftime('%Y%m%dT%H%M%S+0200')
+        to_date = from_date + timedelta(days=1)
+        to_string = to_date.date().strftime('%Y%m%dT%H%M%S+0200')
+
         from_date += timedelta(days=1)
-        from_string = from_date.date().strftime('%Y%m%d')
-        to_date = from_date+timedelta(days=1)
-        to_string = to_date.date().strftime('%Y%m%d')
+
         payload = {
             'lang': 'en_GB',
             'market': 'DK',
@@ -20,8 +22,8 @@ def get_kambi(provider, provider_url, days):
             'channel_id': '1',
             'ncid': '1629387795925',
             'useCombined': 'true',
-            'from': from_string + 'T000000+0200',
-            'to': to_string + 'T000000+0200'
+            'from': from_string,
+            'to': to_string
         }
         request = requests.get(
             'https://eu-offering.kambicdn.org/offering/v2018/'+provider_url+'/listView/all/all/all/all/starting-within.json',

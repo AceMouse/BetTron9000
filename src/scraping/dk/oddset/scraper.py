@@ -7,10 +7,10 @@ import bets.Bet as Bet
 def get_oddset(days=1):
     bets = dict()
     total_bets = 0
-    from_date = datetime.today()
-    from_string = from_date.date().strftime('%Y-%m-%d') + 'T22:00:00Z'
+    from_date = datetime.now() + timedelta(hours=2)
+    from_string = from_date.strftime('%Y-%m-%dT%H:%M:%SZ')
     to_date = from_date+timedelta(days=days)
-    to_string = to_date.date().strftime('%Y-%m-%d') + 'T21:59:59Z'
+    to_string = to_date.date().strftime('%Y-%m-%dT%H:%M:%SZ')
     payload = {
         'startTimeFrom': from_string,
         'startTimeTo': to_string,

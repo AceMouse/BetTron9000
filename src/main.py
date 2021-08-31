@@ -40,10 +40,9 @@ def merge(bets1, bets2):
             bets1[time] = bets2[time]
 
 
-start_date = datetime.date.today()
 i = 0
-while start_date == datetime.date.today():
-    if i % 3 == 0:
+while True:
+    if i % 3 == 2:
         days = 30
     else:
         days = 1
