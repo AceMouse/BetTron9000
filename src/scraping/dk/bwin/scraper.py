@@ -8,11 +8,11 @@ import bets.Bet as Bet
 from datetime import datetime, timedelta
 
 
-def get_bwin(days=1):
+def get_bwin(days=1, offset_hours=2):
     bets = dict()
     total_bets = 0
     provider = 'Bwin'
-    from_date = datetime.now() + timedelta(hours=2)
+    from_date = datetime.now() + timedelta(hours=offset_hours)
     from_string = from_date.strftime('%Y-%m-%dT%H:%M:%S.000Z')
     to_date = from_date + timedelta(days=days)
     to_string = to_date.strftime('%Y-%m-%dT%H:%M:%S.000Z')
@@ -63,20 +63,20 @@ def get_bwin(days=1):
                 continue
 
             time = datetime.strptime(fixture['startDate'], '%Y-%m-%dT%H:%M:%SZ') + timedelta(hours=2)
-            tie_odds = '0'
-            home_odds = '0'
-            away_odds = '0'
+            tie_odds = 0
+            home_odds = 0
+            away_odds = 0
             for market in fixture['optionMarkets']:
-                if market['name']['value'] == 'Match Result':
+                if market['name']['value'] == 'Match Result' and market['status'] != "Suspended":
                     for option in market['options']:
                         if option['name']['value'] == 'X':
-                            tie_odds = str(option['price']['odds'])
+                            tie_odds = float(option['price']['odds'])
                         elif option['name']['value'].replace(' (Women) (Women)', ' (Women)') == home_name:
-                            home_odds = str(option['price']['odds'])
+                            home_odds = float(option['price']['odds'])
                         elif option['name']['value'].replace(' (Women) (Women)', ' (Women)') == away_name:
-                            away_odds = str(option['price']['odds'])
+                            away_odds = float(option['price']['odds'])
                     break
-            if home_odds == '0' or away_odds == '0':
+            if home_odds == 0 or away_odds == 0:
                 continue
             if bets.get(str(time)) is None:
                 bets[str(time)] = []

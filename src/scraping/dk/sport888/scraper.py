@@ -2,5 +2,5 @@
 import src.scraping.dk.kambi.scraper as kambi
 
 
-def get_sport888(days=1):
-    return kambi.get_kambi('888Sport', '888dk', days)
+def get_sport888(days=1, offset_hours=2):
+    return kambi.get_kambi('888Sport', '888dk', days, offset_hours=offset_hours)

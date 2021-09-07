@@ -4,14 +4,14 @@ import bets.Bet as Bet
 from datetime import datetime, timedelta
 
 
-def get_kambi(provider, provider_url, days):
+def get_kambi(provider, provider_url, days, offset_hours=2):
     bets = dict()
     total_bets = 0
-    from_date = datetime.now() + timedelta(hours=2)
+    from_date = datetime.now() + timedelta(hours=offset_hours)
     for _ in range(days):
         from_string = from_date.strftime('%Y%m%dT%H%M%S+0200')
         to_date = from_date + timedelta(days=1)
-        to_string = to_date.date().strftime('%Y%m%dT%H%M%S+0200')
+        to_string = to_date.strftime('%Y%m%dT%H%M%S+0200')
 
         from_date += timedelta(days=1)
 
@@ -26,7 +26,7 @@ def get_kambi(provider, provider_url, days):
             'to': to_string
         }
         request = requests.get(
-            'https://eu-offering.kambicdn.org/offering/v2018/'+provider_url+'/listView/all/all/all/all/starting-within.json',
+            'https://eu-offering.kambicdn.org/offering/v2018/' + provider_url + '/listView/all/all/all/all/starting-within.json',
             params=payload)
         print(f'getting {provider}: ' + request.url)
         if request.ok:
@@ -39,7 +39,7 @@ def get_kambi(provider, provider_url, days):
                 time = datetime.strptime(event['event']['start'], '%Y-%m-%dT%H:%M:%SZ') + timedelta(hours=2)
                 try:
                     home_odds = event['betOffers'][0]['outcomes'][0]['odds'] / 1000
-                    tie_odds = '0'
+                    tie_odds = 0
                     if len(event['betOffers'][0]['outcomes']) == 3:
                         tie_odds = event['betOffers'][0]['outcomes'][1]['odds'] / 1000
                     away_odds = event['betOffers'][0]['outcomes'][-1]['odds'] / 1000

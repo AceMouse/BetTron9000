@@ -4,16 +4,16 @@ import bets.Bet as Bet
 from datetime import datetime, timedelta
 
 
-def get_betstars(days=1):
+def get_betstars(days=1, offset_hours=2):
     bets = dict()
     total_bets = 0
-    date = datetime.today()
+    date = datetime.today() + timedelta(offset_hours)
     provider = 'Betstars'
     sports = ['SOCCER', 'AMERICAN_FOOTBALL', 'TENNIS', 'HANDBALL', 'BASKETBALL', 'ICE_HOCKEY', 'ESPORTS', 'BASEBALL',
               'AUSSIE_RULES', 'BEACH_VOLLEYBALL', 'BOXING', 'TABLE_TENNIS', 'CRICKET', 'CYCLING', 'DARTS', 'FUTSAL',
               'GOLF', 'RALLY', 'MOTOR_SPORTS', 'PESAPALLO', 'RUGBY_LEAGUE', 'RUGBY_UNION', 'SNOOKER', 'BEACH_SOCCER',
               'VOLLEYBALL']
-    for _ in range(days):
+    for _ in range(days+1):
         date_str = date.date().strftime('%Y-%m-%d')
         date += timedelta(days=1)
 
