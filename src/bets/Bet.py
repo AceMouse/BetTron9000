@@ -1,71 +1,127 @@
 import util.arb_calculator as ac
 import util.editing_distance as ed
+import util.bet_size_calculator as bet_size
+
+
+def _sanitize(name):
+    if ',' in name:
+        x = name.split(', ')
+        name = x[-1] + ' ' + x[0]
+    return name.lower()
+
 
 class Bet:
+    class Axiom:
+        def __init__(self, name, odds, provider):
+            self.name = name
+            self.odds = float(odds)
+            self.provider = provider
+
+        def __eq__(self, other):
+            return self.odds == other.odds
+
+        def __lt__(self, other):
+            return self.odds < other.odds
+
+        def __le__(self, other):
+            return self.odds <= other.odds
+
     def __init__(self, home_name, away_name, home_odds, tie_odds, away_odds, home_odds_provider, tie_odds_provider,
                  away_odds_provider, time, sport=''):
-        self.home_name = self.sanitize(home_name)
-        self.away_name = self.sanitize(away_name)
-        self.merged_in_home_names = set()
-        self.merged_in_away_names = set()
-        self.merged_in_home_names.add(self.home_name)
-        self.merged_in_away_names.add(self.away_name)
-        self.home_odds = home_odds
-        self.away_odds = away_odds
-        self.tie_odds = tie_odds
-        self.home_odds_provider = home_odds_provider
-        self.away_odds_provider = away_odds_provider
-        self.tie_odds_provider = tie_odds_provider
+        self.home_axioms = [self.Axiom(_sanitize(home_name), home_odds, home_odds_provider)]
+        self.tie_axioms = [self.Axiom('x', tie_odds, tie_odds_provider)]
+        self.away_axioms = [self.Axiom(_sanitize(away_name), away_odds, away_odds_provider)]
+
         self.time = time
-        self.arb = ac.get_arb_percentage(home_odds, tie_odds, away_odds)
         self.sport = sport
 
+        self.arb = ac.get_arb_percentage(home_odds, tie_odds, away_odds)
+
     def merge(self, other):
-        if ed.is_similar(self.home_name.lower(), other.home_name.lower()):
-            self.merged_in_home_names.add(other.home_name)
-            self.merged_in_away_names.add(other.away_name)
-            if float(self.home_odds) < float(other.home_odds):
-                self.home_odds = other.home_odds
-                self.home_odds_provider = other.home_odds_provider
-            if float(self.tie_odds) < float(other.tie_odds):
-                self.tie_odds = other.tie_odds
-                self.tie_odds_provider = other.tie_odds_provider
-            if float(self.away_odds) < float(other.away_odds):
-                self.away_odds = other.away_odds
-                self.away_odds_provider = other.away_odds_provider
+        if ed.is_similar(self.home_axioms[0].name, other.home_axioms[0].name):
+            for axiom in other.home_axioms:
+                self.home_axioms.append(axiom)
+            for axiom in other.tie_axioms:
+                self.tie_axioms.append(axiom)
+            for axiom in other.away_axioms:
+                self.away_axioms.append(axiom)
         else:
-            if float(self.home_odds) < float(other.away_odds):
-                self.home_odds = other.away_odds
-                self.home_odds_provider = other.away_odds_provider
-            if float(self.tie_odds) < float(other.tie_odds):
-                self.tie_odds = other.tie_odds
-                self.tie_odds_provider = other.tie_odds_provider
-            if float(self.away_odds) < float(other.home_odds):
-                self.away_odds = other.home_odds
-                self.away_odds_provider = other.home_odds_provider
-        self.arb = ac.get_arb_percentage(self.home_odds, self.tie_odds, self.away_odds)
+            for axiom in other.away_axioms:
+                self.home_axioms.append(axiom)
+            for axiom in other.tie_axioms:
+                self.tie_axioms.append(axiom)
+            for axiom in other.home_axioms:
+                self.away_axioms.append(axiom)
+
         if len(other.sport) > len(self.sport):
             self.sport = other.sport
 
-    def sanitize(self, name):
-        if ',' in name:
-            x = name.split(', ')
-            name = x[-1] + ' ' + x[0]
-        return name
+        self.home_axioms.sort(reverse=True)
+        self.tie_axioms.sort(reverse=True)
+        self.away_axioms.sort(reverse=True)
+        self.arb = ac.get_arb_percentage(self.home_axioms[0].odds,
+                                         self.tie_axioms[0].odds,
+                                         self.away_axioms[0].odds)
 
+    def home_name(self):
+        return self.home_axioms[0].name
+
+    def tie_name(self):
+        return self.tie_axioms[0].name
+
+    def away_name(self):
+        return self.away_axioms[0].name
+
+    def home_odds(self):
+        return float(self.home_axioms[0].odds)
+
+    def tie_odds(self):
+        return float(self.tie_axioms[0].odds)
+
+    def away_odds(self):
+        return float(self.away_axioms[0].odds)
+
+    def home_provider(self):
+        return self.home_axioms[0].provider
+
+    def tie_provider(self):
+        return self.tie_axioms[0].provider
+
+    def away_provider(self):
+        return self.away_axioms[0].provider
+    
     def tostring(self):
-        s = str(self.time) + '\n' + 'HOME: ' + self.home_name + ' vs AWAY: ' + self.away_name + '\n'
-        s += 'HOME: ' + str(self.merged_in_home_names) + ' vs AWAY: ' + str(self.merged_in_away_names) + '\n'
+        s = f'{self.time}\n'
+
         if self.sport != '':
-            s += 'Sport:' + self.sport + '\n'
-        if self.tie_odds == '0':
-            s += '2 outcomes: HOME: ' + self.home_odds_provider + ' vs AWAY: ' + self.away_odds_provider + '\n'
-            s += '            HOME: ' + str(self.home_odds) + ' vs AWAY: ' + str(self.away_odds)
+            s += f'Sport: {self.sport}\n'
+
+        h, t, a = bet_size.get_bet_sizes(self)
+        if self.tie_odds() != 0:
+            s += f'|{"HOME":^50}|{"TIE":^50}|{"AWAY":^50}|\n'
+            s += f'{"_"*154}\n'
+            s += f'|{"name":^28}|{"provider":^13}|{"odds":^7}|'
+            s += f'{"name":^28}|{"provider":^13}|{"odds":^7}|'
+            s += f'{"name":^28}|{"provider":^13}|{"odds":^7}|\n'
+            for i in range(len(self.home_axioms)):
+                s += f'|{self.home_axioms[i].name:^28}|{self.home_axioms[i].provider:^13}|{self.home_axioms[i].odds:^7}|'
+                s += f'{self.tie_axioms[i].name:^28}|{self.tie_axioms[i].provider:^13}|{self.tie_axioms[i].odds:^7}|'
+                s += f'{self.away_axioms[i].name:^28}|{self.away_axioms[i].provider:^13}|{self.away_axioms[i].odds:^7}|\n'
+            s += f'{"_"*154}\n'
+            s += f'|{"bet size":^50}|{"bet size":^50}|{"bet size":^50}|\n'
+            s += f'|{str(int(h)) + " dkk":^50}|{str(int(t)) + " dkk":^50}|{str(int(a)) + " dkk":^50}|\n'
         else:
-            s += '3 outcomes: HOME: ' + self.home_odds_provider + ' vs TIE: ' + self.tie_odds_provider + ' vs AWAY: ' + self.away_odds_provider + '\n'
-            s += '            HOME: ' + str(self.home_odds) + ' vs TIE: ' + str(self.tie_odds) + ' vs AWAY: ' + str(
-                self.away_odds)
-        s += '\nTotal arbitrage (%) ' + str(self.arb)
+            s += f'|{"HOME":^50}|{"AWAY":^50}|\n'
+            s += f'{"_"*103}\n'
+            s += f'|{"name":^28}|{"provider":^13}|{"odds":^7}|'
+            s += f'{"name":^28}|{"provider":^13}|{"odds":^7}|\n'
+            for i in range(len(self.home_axioms)):
+                s += f'|{self.home_axioms[i].name:^28}|{self.home_axioms[i].provider:^13}|{self.home_axioms[i].odds:^7}|'
+                s += f'{self.away_axioms[i].name:^28}|{self.away_axioms[i].provider:^13}|{self.away_axioms[i].odds:^7}|\n'
+            s += f'{"_"*103}\n'
+            s += f'|{"bet size":^50}|{"bet size":^50}|\n'
+            s += f'|{str(int(h)) + " dkk":^50}|{str(int(a)) + " dkk":^50}|\n'
+        s += f'Total arbitrage (%) {self.arb}\n'
         return s
 
     def __eq__(self, other):
