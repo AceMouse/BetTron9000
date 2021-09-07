@@ -51,15 +51,19 @@ while True:
         days = 30
     else:
         days = 2
-    bets = run_scrapers(days=days, offset_hours=2)
+    bets = run_scrapers(days=days, offset_hours=1)
     list = []
     for bet_list in bets.values():
         list.extend(bet_list)
-    list.sort(reverse=True)
     for bet in list:
-        print()
-        print(bet.tostring())
-        print()
+        bet.sort_axioms()
+    list.sort(reverse=True)
+    to_print = []
+    for bet in list:
+        to_print.append('\n')
+        bet.add_string_to_list(to_print)
+        to_print.append('\n')
+    print(''.join(to_print))
 
     print(f'Total bets: {len(list)}')
     print('last scrape at: ' + str(datetime.datetime.now()))
