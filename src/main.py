@@ -7,6 +7,7 @@ import scraping.dk.bwin.scraper as bwin
 import scraping.dk.bet25.scraper as bet25
 import scraping.dk.betstars.scraper as betstars
 import util.editing_distance as ed
+import util.bet_size_calculator as bc
 import time
 import winsound
 import datetime
@@ -30,7 +31,10 @@ def merge(bets1, bets2):
             for bet_2 in bets2[time]:
                 merged = False
                 for bet_1 in bets1[time]:
-                    if ed.is_similar(bet_1.home_name, bet_2.home_name) and ed.is_similar(bet_1.away_name, bet_2.away_name):
+                    if (ed.is_similar(bet_1.home_name(), bet_2.home_name()) and ed.is_similar(bet_1.away_name(),
+                                                                                              bet_2.away_name())) or (
+                            ed.is_similar(bet_1.away_name(), bet_2.home_name()) and ed.is_similar(bet_1.home_name(),
+                                                                                                  bet_2.away_name())):
                         bet_1.merge(bet_2)
                         merged = True
                         break
@@ -40,6 +44,7 @@ def merge(bets1, bets2):
             bets1[time] = bets2[time]
 
 
+bc.total_bet_amount = float(input("how much do you want to bet (dkk)?\n\t>>>"))
 i = 0
 while True:
     if i % 3 == 2:
@@ -50,8 +55,7 @@ while True:
     list = []
     for bet_list in bets.values():
         list.extend(bet_list)
-    list.sort()
-    list.reverse()
+    list.sort(reverse=True)
     for bet in list:
         print()
         print(bet.tostring())
@@ -67,4 +71,4 @@ while True:
         winsound.Beep(freq, duration)
 
     i += 1
-    time.sleep(60 * 30)
+    time.sleep(60 * 10)
