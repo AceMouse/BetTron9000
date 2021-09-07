@@ -1,7 +1,8 @@
 import json
 import requests
-import bets.Bet as Bet
 from datetime import datetime, timedelta
+
+from util import bet_adder
 
 
 def get_kambi(provider, provider_url, days, offset_hours=2):
@@ -45,17 +46,12 @@ def get_kambi(provider, provider_url, days, offset_hours=2):
                     away_odds = event['betOffers'][0]['outcomes'][-1]['odds'] / 1000
                 except:
                     continue
-                if bets.get(str(time)) is None:
-                    bets[str(time)] = []
-                bets[str(time)].append(
-                    Bet.Bet(
-                        home_name, away_name,
-                        home_odds, tie_odds, away_odds,
-                        provider, provider, provider,
-                        time
-                    )
-                )
-                total_bets += 1
+                if bet_adder.try_to_add_bet_to_bets(bets,
+                                                    home_name, away_name,
+                                                    away_odds, tie_odds, home_odds,
+                                                    provider,
+                                                    time):
+                    total_bets += 1
         else:
             print('request failure')
     print('Events total: ' + str(total_bets))

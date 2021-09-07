@@ -1,7 +1,7 @@
 import json
 import requests
-import bets.Bet as Bet
-from datetime import datetime, timedelta
+from datetime import datetime
+from util import bet_adder
 
 
 def get_bet25(hours=48):
@@ -19,32 +19,25 @@ def get_bet25(hours=48):
             away_name = event['awayTeam']
             time = datetime.strptime(event['kickoffDate']+event['kickoffTime'], '%d.%m.%Y%H:%M')
 
-            tie_odds = '0'
-            home_odds = '0'
-            away_odds = '0'
+            tie_odds = 0
+            home_odds = 0
+            away_odds = 0
             for market in event['marketList']:
                 if market['marketTypeName'] == 'Fuldtid' and market['marketName'] == 'Vinder':
                     for item in market['itemList']:
                         if item['competitor'] == 'Uafgjort' or item['bet'] == 'X':
-                            tie_odds = str(item['odds'])
+                            tie_odds = float(item['odds'])
                         elif item['competitor'] == home_name:
-                            home_odds = str(item['odds'])
+                            home_odds = float(item['odds'])
                         elif item['competitor'] == away_name:
-                            away_odds = str(item['odds'])
+                            away_odds = float(item['odds'])
                     break
-            if home_odds == '0' or away_odds == '0':
-                continue
-            if bets.get(str(time)) is None:
-                bets[str(time)] = []
-            bets[str(time)].append(
-                Bet.Bet(
-                    home_name, away_name,
-                    home_odds, tie_odds, away_odds,
-                    provider, provider, provider,
-                    time
-                )
-            )
-            total_bets += 1
+            if bet_adder.try_to_add_bet_to_bets(bets,
+                                                home_name, away_name,
+                                                away_odds, tie_odds, home_odds,
+                                                provider,
+                                                time):
+                total_bets += 1
         print('Events total: ' + str(total_bets))
         print('success')
         return bets

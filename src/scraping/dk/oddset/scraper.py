@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta
 import json
 import requests
-import bets.Bet as Bet
+from util import bet_adder
 
 
 def get_oddset(days=1, offset_hours=2):
@@ -56,20 +56,13 @@ def get_oddset(days=1, offset_hours=2):
                             else:
                                 tie_odds = float(i['prices'][0]['decimal'])
                 break
-            if home_odds == 0 or away_odds == 0:
-                continue
-
-            if bets.get(str(time)) is None:
-                bets[str(time)] = []
-            bets[str(time)].append(
-                  Bet.Bet(
-                      home_name, away_name,
-                      home_odds, tie_odds, away_odds,
-                      provider, provider, provider,
-                      time, sport
-                  )
-            )
-            total_bets += 1
+            if bet_adder.try_to_add_bet_to_bets(bets,
+                                                home_name, away_name,
+                                                away_odds, tie_odds, home_odds,
+                                                provider,
+                                                time,
+                                                sport):
+                total_bets += 1
 
         print('Events total: ' + str(total_bets))
         print('success')
