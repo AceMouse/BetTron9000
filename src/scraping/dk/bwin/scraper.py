@@ -1,8 +1,8 @@
 import json
 import requests
 from datetime import datetime, timedelta
+from scraping.dk.scraper_runner import run_scraper
 from util import bet_adder
-import util.bet_size_calculator as bc
 
 
 def get_bwin(days=1, offset_hours=2):
@@ -97,7 +97,8 @@ def get_bwin(days=1, offset_hours=2):
                                                 away_odds, tie_odds, home_odds,
                                                 provider,
                                                 time,
-                                                home_x_odds=home_x_odds, x_away_odds=x_away_odds, home_away_odds=home_away_odds):
+                                                home_x_odds=home_x_odds, x_away_odds=x_away_odds,
+                                                home_away_odds=home_away_odds):
                 total_bets += 1
         print('Events total: ' + str(total_bets))
         print('success')
@@ -108,26 +109,5 @@ def get_bwin(days=1, offset_hours=2):
         return {}
 
 
-def main():
-    bc.total_bet_amount = float(input("how much do you want to bet (dkk)?\n\t>>>"))
-    bets = get_bwin()
-
-    list = []
-    for bet_list in bets.values():
-        list.extend(bet_list)
-    for bet in list:
-        bet.sort_axioms()
-    list.sort(reverse=True)
-    to_print = []
-    for bet in list:
-        to_print.append('\n')
-        bet.add_string_to_list(to_print)
-        to_print.append('\n')
-    print(''.join(to_print))
-
-    print(f'Total bets: {len(list)}')
-    print('last scrape at: ' + str(datetime.now()))
-
-
 if __name__ == '__main__':
-    main()
+    run_scraper(get_bwin)

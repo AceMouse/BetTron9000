@@ -1,6 +1,8 @@
 import json
 import requests
 from datetime import datetime
+
+from scraping.dk.scraper_runner import run_scraper
 from util import bet_adder
 
 
@@ -44,3 +46,7 @@ def get_bet25(hours=48):
     else:
         print('request failure')
         return {}
+
+
+if __name__ == '__main__':
+    run_scraper(get_bet25)

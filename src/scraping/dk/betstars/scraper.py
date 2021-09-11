@@ -1,6 +1,8 @@
 import json
 import requests
 from datetime import datetime, timedelta
+
+from scraping.dk.scraper_runner import run_scraper
 from util import bet_adder
 
 
@@ -67,3 +69,7 @@ def get_betstars(days=1, offset_hours=2):
     print('Events total: ' + str(total_bets))
     print('success')
     return bets
+
+
+if __name__ == '__main__':
+    run_scraper(get_betstars)
