@@ -61,7 +61,7 @@ def get_oddset(days=1, offset_hours=2):
                                                 away_odds, tie_odds, home_odds,
                                                 provider,
                                                 time,
-                                                sport):
+                                                sport=sport):
                 total_bets += 1
 
         print('Events total: ' + str(total_bets))

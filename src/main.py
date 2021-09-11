@@ -10,7 +10,7 @@ import util.editing_distance as ed
 import util.bet_size_calculator as bc
 import time
 import winsound
-import datetime
+from datetime import datetime
 
 
 def run_scrapers(days=1, offset_hours=2):
@@ -44,35 +44,49 @@ def merge(bets1, bets2):
             bets1[time] = bets2[time]
 
 
-bc.total_bet_amount = float(input("how much do you want to bet (dkk)?\n\t>>>"))
-i = 0
-while True:
-    if i % 3 == 2:
-        days = 30
-    else:
-        days = 2
-    bets = run_scrapers(days=days, offset_hours=1)
-    list = []
-    for bet_list in bets.values():
-        list.extend(bet_list)
-    for bet in list:
-        bet.sort_axioms()
-    list.sort(reverse=True)
-    to_print = []
-    for bet in list:
-        to_print.append('\n')
-        bet.add_string_to_list(to_print)
-        to_print.append('\n')
-    print(''.join(to_print))
+def main():
+    bc.total_bet_amount = float(input("how much do you want to bet (dkk)?\n\t>>>"))
+    i = 0
+    while True:
+        if i % 3 == 0:
+            days = 5
+        else:
+            days = 2
+        try:
+            bets = run_scrapers(days=days, offset_hours=0)
+        except:
+            duration = 500  # milliseconds
+            freq = 440  # Hz
+            winsound.Beep(freq, duration)
+            time.sleep(1)
+            winsound.Beep(freq, duration)
+            time.sleep(30)
+            main()
+        list = []
+        for bet_list in bets.values():
+            list.extend(bet_list)
+        for bet in list:
+            bet.sort_axioms()
+        list.sort(reverse=True)
+        to_print = []
+        for bet in list:
+            to_print.append('\n')
+            bet.add_string_to_list(to_print)
+            to_print.append('\n')
+        print(''.join(to_print))
 
-    print(f'Total bets: {len(list)}')
-    print('last scrape at: ' + str(datetime.datetime.now()))
-    duration = 500  # milliseconds
-    freq = 440  # Hz
-    if list[-1].arb < 100:
-        winsound.Beep(freq, duration)
-        time.sleep(1)
-        winsound.Beep(freq, duration)
+        print(f'Total bets: {len(list)}')
+        print('last scrape at: ' + str(datetime.now()))
+        duration = 500  # milliseconds
+        freq = 440  # Hz
+        if list[-1].arb < 100:
+            winsound.Beep(freq, duration)
+            time.sleep(1)
+            winsound.Beep(freq, duration)
 
-    i += 1
-    time.sleep(60 * 10)
+        i += 1
+        time.sleep(60 * 15)
+
+
+if __name__ == '__main__':
+    main()

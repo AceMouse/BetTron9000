@@ -59,7 +59,7 @@ def get_betstars(days=1, offset_hours=2):
                                                         away_odds, tie_odds, home_odds,
                                                         provider,
                                                         time,
-                                                        sport):
+                                                        sport=sport):
                         total_bets += 1
             else:
                 print('request failure')
