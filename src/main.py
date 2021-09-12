@@ -48,7 +48,7 @@ def main():
     bc.total_bet_amount = float(input("how much do you want to bet (dkk)?\n\t>>>"))
     i = 0
     while True:
-        if i % 3 == 0:
+        if i % 3 == 2:
             days = 5
         else:
             days = 2
@@ -69,7 +69,7 @@ def main():
             bet.sort_axioms()
         list.sort(reverse=True)
         to_print = []
-        for bet in list:
+        for bet in list[-10:]:
             to_print.append('\n')
             bet.add_string_to_list(to_print)
             to_print.append('\n')

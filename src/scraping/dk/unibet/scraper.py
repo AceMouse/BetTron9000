@@ -8,4 +8,3 @@ def get_unibet(days=1, offset_hours=2):
 
 if __name__ == '__main__':
     run_scraper(get_unibet)
-
