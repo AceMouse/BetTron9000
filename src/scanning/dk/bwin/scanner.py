@@ -1,7 +1,7 @@
 import json
 import requests
 from datetime import datetime, timedelta
-from scraping.dk.scraper_runner import run_scraper
+from scanning.dk.scanner_runner import run_scanner
 from util import bet_adder
 
 
@@ -110,4 +110,4 @@ def get_bwin(days=1, offset_hours=2):
 
 
 if __name__ == '__main__':
-    run_scraper(get_bwin)
+    run_scanner(get_bwin)

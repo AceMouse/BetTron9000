@@ -1,5 +1,5 @@
-import src.scraping.dk.kambi.scraper as kambi
-from scraping.dk.scraper_runner import run_scraper
+import src.scanning.dk.kambi.scanner as kambi
+from scanning.dk.scanner_runner import run_scanner
 
 
 def get_sport888(days=1, offset_hours=2):
@@ -7,4 +7,4 @@ def get_sport888(days=1, offset_hours=2):
 
 
 if __name__ == '__main__':
-    run_scraper(get_sport888)
+    run_scanner(get_sport888)

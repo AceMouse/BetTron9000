@@ -3,7 +3,7 @@ import time as t
 import json
 import requests
 
-from scraping.dk.scraper_runner import run_scraper
+from scanning.dk.scanner_runner import run_scanner
 from util import bet_adder
 
 
@@ -95,6 +95,6 @@ def get_oddset(days=1, offset_hours=2):
 
 
 if __name__ == '__main__':
-    run_scraper(get_oddset)
+    run_scanner(get_oddset)
 
 

@@ -1,11 +1,11 @@
-import scraping.dk.oddset.scraper as oddset
-import scraping.dk.unibet.scraper as unibet
-import scraping.dk.sport888.scraper as sport888
-import scraping.dk.mr_green.scraper as mr_green
-import scraping.dk.leo_vegas.scraper as leo_vegas
-import scraping.dk.bwin.scraper as bwin
-import scraping.dk.bet25.scraper as bet25
-import scraping.dk.betstars.scraper as betstars
+import scanning.dk.oddset.scanner as oddset
+import scanning.dk.unibet.scanner as unibet
+import scanning.dk.sport888.scanner as sport888
+import scanning.dk.mr_green.scanner as mr_green
+import scanning.dk.leo_vegas.scanner as leo_vegas
+import scanning.dk.bwin.scanner as bwin
+import scanning.dk.bet25.scanner as bet25
+import scanning.dk.betstars.scanner as betstars
 import util.editing_distance as ed
 import util.bet_size_calculator as bc
 import time
@@ -45,7 +45,7 @@ def merge(bets1, bets2):
 
 
 def main():
-    bc.total_bet_amount = float(input("how much do you want to bet (dkk)?\n\t>>>"))
+    bc.total_bet_amount = float(input("How much do you want to bet (dkk)?\n\t>>>"))
     i = 0
     while True:
         if i % 3 == 2:
@@ -76,7 +76,7 @@ def main():
         print(''.join(to_print))
 
         print(f'Total bets: {len(list)}')
-        print('last scrape at: ' + str(datetime.now()))
+        print('Last scan at: ' + str(datetime.now()))
         duration = 500  # milliseconds
         freq = 440  # Hz
         if list[-1].arb < 100:

@@ -3,8 +3,8 @@ from datetime import datetime
 import util.bet_size_calculator as bc
 
 
-def run_scraper(scraper):
-    bets = scraper()
+def run_scanner(scanner):
+    bets = scanner()
 
     list = []
     for bet_list in bets.values():
@@ -20,4 +20,4 @@ def run_scraper(scraper):
     print(''.join(to_print))
 
     print(f'Total bets: {len(list)}')
-    print('last scrape at: ' + str(datetime.now()))
+    print('Last scan at: ' + str(datetime.now()))
