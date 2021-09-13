@@ -16,6 +16,33 @@ def flip_names(name):
 
 
 class Bet:
+    class OddsInfo:
+        def __init__(self):
+            self.home_away_odds = 1
+            self.x_away_odds = 1
+            self.home_x_odds = 1
+            self.tie_odds = 1
+            self.home_odds = 1
+            self.away_odds = 1
+
+        def set_home(self, odds):
+            self.home_odds = odds
+
+        def set_away(self, odds):
+            self.away_odds = odds
+
+        def set_tie(self, odds):
+            self.tie_odds = odds
+
+        def set_home_x(self, odds):
+            self.home_x_odds = odds
+
+        def set_x_away(self, odds):
+            self.x_away_odds = odds
+
+        def set_home_away(self, odds):
+            self.home_away_odds = odds
+
     class Axiom:
         def __init__(self, name, odds, provider):
             self.name = name
@@ -31,25 +58,24 @@ class Bet:
         def __le__(self, other):
             return self.odds <= other.odds
 
-    def __init__(self, home_name, away_name, home_odds, tie_odds, away_odds, provider, time,
-                 home_x_odds=0, x_away_odds=0, home_away_odds=0,
-                 sport=''):
-        self.home_axioms = [self.Axiom(_sanitize(home_name), home_odds, provider)]
-        self.tie_axioms = [self.Axiom('x', tie_odds, provider)]
-        self.away_axioms = [self.Axiom(_sanitize(away_name), away_odds, provider)]
+    def __init__(self, home_name, away_name, odds_info, provider, time, sport=''):
+        self.home_axioms = [self.Axiom(_sanitize(home_name), odds_info.home_odds, provider)]
+        self.tie_axioms = [self.Axiom('x', odds_info.tie_odds, provider)]
+        self.away_axioms = [self.Axiom(_sanitize(away_name), odds_info.away_odds, provider)]
 
-        self.home_x_axioms = [self.Axiom(f'{_sanitize(home_name)} or x', home_x_odds, provider)]
-        self.x_away_axioms = [self.Axiom(f'x or {_sanitize(away_name)}', x_away_odds, provider)]
+        self.home_x_axioms = [self.Axiom(f'{_sanitize(home_name)} or x', odds_info.home_x_odds, provider)]
+        self.x_away_axioms = [self.Axiom(f'x or {_sanitize(away_name)}', odds_info.x_away_odds, provider)]
         self.home_away_axioms = [
-            self.Axiom(f'{_sanitize(home_name)} or {_sanitize(away_name)}', home_away_odds, provider)]
+            self.Axiom(f'{_sanitize(home_name)} or {_sanitize(away_name)}', odds_info.home_away_odds, provider)]
+
         self.time = time
         self.sport = sport
 
-        self.arb = \
-            self.arb_match_result = \
-            self.arb_double_x_away = \
-            self.arb_double_home_x = \
-            self.arb_double_home_away = 0
+        self.arb = 0
+        self.arb_match_result = 0
+        self.arb_double_x_away = 0
+        self.arb_double_home_x = 0
+        self.arb_double_home_away = 0
 
     def sort_axioms(self):
         self.home_axioms.sort(reverse=True)
@@ -58,6 +84,9 @@ class Bet:
         self.home_x_axioms.sort(reverse=True)
         self.x_away_axioms.sort(reverse=True)
         self.home_away_axioms.sort(reverse=True)
+        self.set_arb()
+
+    def set_arb(self):
         self.arb_match_result = ac.get_3arb_percentage(self.home_axioms[0].odds,
                                                        self.tie_axioms[0].odds,
                                                        self.away_axioms[0].odds)
@@ -128,101 +157,51 @@ class Bet:
         return self.away_axioms[0].provider
 
     def add_string_to_list(self, list):
-        list.append(
-            f'{self.time}'
-            f'\n'
-        )
+        list.append(f'{self.time}\n')
 
         if self.sport != '':
-            list.append(
-                f'Sport: {self.sport}'
-                f'\n'
-            )
+            list.append(f'Sport: {self.sport}\n')
 
         if self.arb_match_result == self.arb:
-
             if self.tie_odds() != 0:
-                h, t, a = bet_size.get_3bet_sizes(self.home_axioms[0], self.tie_axioms[0], self.away_axioms[0], self.arb)
-                list.append(
-                    f'|{"HOME":^50}|{"TIE":^50}|{"AWAY":^50}|\n'
-                    f'{"_" * 154}\n'
-                    f'|{"name":^28}|{"provider":^13}|{"odds":^7}|'
-                    f'{"name":^28}|{"provider":^13}|{"odds":^7}|'
-                    f'{"name":^28}|{"provider":^13}|{"odds":^7}|'
-                    f'\n'
-                )
-                for i in range(len(self.home_axioms)):
-                    list.append(
-                        f'|{self.home_axioms[i].name:^28}|{self.home_axioms[i].provider:^13}|{self.home_axioms[i].odds:^7}|'
-                        f'{self.tie_axioms[i].name:^28}|{self.tie_axioms[i].provider:^13}|{self.tie_axioms[i].odds:^7}|'
-                        f'{self.away_axioms[i].name:^28}|{self.away_axioms[i].provider:^13}|{self.away_axioms[i].odds:^7}|'
-                        f'\n'
-                    )
-                list.append(
-                    f'{"_" * 154}\n'
-                    f'|{"bet size":^50}|{"bet size":^50}|{"bet size":^50}|\n'
-                    f'|{str(round(h, 5)) + " dkk":^50}|{str(round(t, 5)) + " dkk":^50}|{str(round(a, 5)) + " dkk":^50}|'
-                    f'\n'
-                )
+                self._add_string_to_list(list, ['HOME', 'TIE', 'AWAY'], [self.home_axioms, self.tie_axioms, self.away_axioms])
             else:
-                self._add_2way_string_to_list(list, "HOME", "AWAY", self.home_axioms, self.away_axioms)
+                self._add_string_to_list(list, ["HOME", "AWAY"], [self.home_axioms, self.away_axioms])
 
         elif self.arb_double_home_x == self.arb:
-            self._add_2way_string_to_list(list, "HOME or X", "AWAY", self.home_x_axioms, self.away_axioms)
+            self._add_string_to_list(list, ["HOME or X", "AWAY"], [self.home_x_axioms, self.away_axioms])
 
         elif self.arb_double_x_away == self.arb:
-            self._add_2way_string_to_list(list, "HOME", "X or AWAY", self.home_axioms, self.x_away_axioms)
+            self._add_string_to_list(list, ["HOME", "X or AWAY"], [self.home_axioms, self.x_away_axioms])
 
         elif self.arb_double_home_away == self.arb:
-            self._add_2way_string_to_list(list, "HOME or AWAY", "X", self.home_away_axioms, self.tie_axioms)
+            self._add_string_to_list(list, ["HOME or AWAY", "X"], [self.home_away_axioms, self.tie_axioms])
 
-        list.append(
-            f'Total arbitrage (%) {self.arb}'
-            f'\n'
-        )
+        list.append(f'Total arbitrage (%) {self.arb}\n')
 
-    def _add_3way_string_to_list(self, list, col1, col2, col3, axioms1, axioms2, axioms3):
-        bet_size1, bet_size2, bet_size3 = bet_size.get_3bet_sizes(axioms1[0], axioms2[0], axioms3[0], self.arb)
-        list.append(
-            f'|{col1:^50}|{col2:^50}|{col3:^50}|\n'
-            f'{"_" * 103}\n'
-            f'|{"name":^28}|{"provider":^13}|{"odds":^7}|'
-            f'{"name":^28}|{"provider":^13}|{"odds":^7}|\n'
-        )
-        for i in range(len(axioms1)):
-            list.append(
-                f'|{axioms1[i].name:^28}|{axioms1[i].provider:^13}|{str(round(axioms1[i].odds, 7)):^7}|'
-                f'{axioms2[i].name:^28}|{axioms2[i].provider:^13}|{str(round(axioms2[i].odds, 7)):^7}|'
-                f'{axioms3[i].name:^28}|{axioms3[i].provider:^13}|{str(round(axioms3[i].odds, 7)):^7}|'
-                f'\n'
-            )
-        list.append(
-            f'{"_" * 154}\n'
-            f'|{"bet size":^50}|{"bet size":^50}|{"bet size":^50}|\n'
-            f'|{str(round(bet_size1, 5)) + " dkk":^50}|{str(round(bet_size2, 5)) + " dkk":^50}|{str(round(bet_size3, 5)) + " dkk":^50}|'
-            f'\n'
-        )
+    def _add_string_to_list(self, list, cols, axioms_list):
+        bet_sizes = bet_size.get_bet_sizes([axioms[0] for axioms in axioms_list], self.arb)
+        col_width = 25*(5-len(cols))
+        name_width = col_width-22
+        total_width = 151+len(cols)
 
-    def _add_2way_string_to_list(self, list, col1, col2, axioms1, axioms2):
-        bet_size1, bet_size2 = bet_size.get_2bet_sizes(axioms1[0], axioms2[0], self.arb)
+        list.extend([f'|{col:^{col_width}}' for col in cols])
         list.append(
-            f'|{col1:^75}|{col2:^75}|\n'
-            f'{"_" * 153}\n'
-            f'|{"name":^53}|{"provider":^13}|{"odds":^7}|'
-            f'{"name":^53}|{"provider":^13}|{"odds":^7}|\n'
+            '|\n'
+            f'{"_" * total_width}\n'
         )
-        for i in range(len(axioms1)):
-            list.append(
-                f'|{axioms1[i].name:^53}|{axioms1[i].provider:^13}|{str(round(axioms1[i].odds, 7)):^7}|'
-                f'{axioms2[i].name:^53}|{axioms2[i].provider:^13}|{str(round(axioms2[i].odds, 7)):^7}|'
-                f'\n'
-            )
-        list.append(
-            f'{"_" * 153}\n'
-            f'|{"bet size":^75}|{"bet size":^75}|\n'
-            f'|{str(round(bet_size1, 5)) + " dkk":^75}|{str(round(bet_size2, 5)) + " dkk":^75}|'
-            f'\n'
-        )
+        list.extend([f'|{"name":^{name_width}}|{"provider":^13}|{"odds":^7}' for _ in range(len(cols))])
+        list.append('|\n')
+        for i in range(min([len(axioms) for axioms in axioms_list])):
+            list.extend([f'|{axioms[i].name:^{name_width}}|{axioms[i].provider:^13}|{str(round(axioms[i].odds, 7)):^7}'
+                         for axioms in axioms_list])
+            list.append('|\n')
+
+        list.append(f'{"_" * total_width}\n')
+        list.extend([f'|{"bet size":^{col_width}}' for _ in range(len(cols))])
+        list.append(f'|\n')
+        list.extend([f'|{str(round(size, 5)) + " dkk":^{col_width}}' for size in bet_sizes])
+        list.append(f'|\n')
 
     def __eq__(self, other):
         return self.arb == other.arb
