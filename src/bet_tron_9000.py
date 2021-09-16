@@ -19,7 +19,7 @@ def run_scrapers(days=1, offset_hours=2):
     merger.merge(bets, sport888.get_sport888(days=days, offset_hours=offset_hours))
     merger.merge(bets, mr_green.get_mr_green(days=days, offset_hours=offset_hours))
     merger.merge(bets, leo_vegas.get_leo_vegas(days=days, offset_hours=offset_hours))
-    merger.merge(bets, bwin.get_bwin(days=days, offset_hours=offset_hours))
+    #merger.merge(bets, bwin.get_bwin(days=days, offset_hours=offset_hours))
     merger.merge(bets, bet25.get_bet25(hours=(days + 1) * 24))
     merger.merge(bets, betstars.get_betstars(days=days, offset_hours=offset_hours))
     return bets
@@ -39,7 +39,7 @@ def main():
             winsound.Beep(freq, duration)
             time.sleep(1)
             winsound.Beep(freq, duration)
-            main()
+
         list = []
         for bet_list in bets.values():
             list.extend(bet_list)

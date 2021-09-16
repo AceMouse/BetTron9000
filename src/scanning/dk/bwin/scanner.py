@@ -2,15 +2,15 @@ import json
 import requests
 from datetime import datetime, timedelta
 from scanning.dk.scanner_runner import run_scanner
-from util import bet_adder
+from util import bet_adder, editing_distance
 import bets
 
 
 class BwinOddsInfo(bets.Bet.Bet.OddsInfo):
     def __init__(self, names):
         super().__init__()
-        self.home_name = names[0].lower()
-        self.away_name = names[1].lower()
+        self.home_name = names[0]
+        self.away_name = names[1]
 
     def _extract_odds(self, market, market_name, outcomes):
         if market['name']['value'] != market_name or market['status'] == 'Suspended':
@@ -18,21 +18,23 @@ class BwinOddsInfo(bets.Bet.Bet.OddsInfo):
         for option in market['options']:
             if option['status'] == 'Suspended':
                 continue
-            name = option['name']['value'].replace(' (Women) (Women)', ' (Women)').lower()
-            outcomes[name](float(option['price']['odds']))
+            for key, fn in outcomes.items():
+                if editing_distance.is_similar(key, option['name']['value'].replace(' (Women) (Women)', ' (Women)'), 0.2):
+                    fn(float(option['price']['odds']))
+                    break
 
     def extract_single_odds(self, market):
         self._extract_odds(market, 'Match Result',
                            {self.home_name: self.set_home,
                             self.away_name: self.set_away,
-                            'X'.lower(): self.set_tie}
+                            'X': self.set_tie}
                            )
 
     def extract_double_chance_odds(self, market):
         self._extract_odds(market, 'Double Chance',
-                           {f'{self.home_name} or X'.lower(): self.set_home_x,
-                            f'X or {self.away_name}'.lower(): self.set_x_away,
-                            f'{self.home_name} or {self.away_name}'.lower(): self.set_home_away}
+                           {f'{self.home_name} or X': self.set_home_x,
+                            f'X or {self.away_name}': self.set_x_away,
+                            f'{self.home_name} or {self.away_name}': self.set_home_away}
                            )
 
 
