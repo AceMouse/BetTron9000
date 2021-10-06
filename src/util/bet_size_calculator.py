@@ -1,4 +1,4 @@
-total_bet_amount = 100
+total_bet_amount = 3000
 
 
 def _size(axiom, arb):

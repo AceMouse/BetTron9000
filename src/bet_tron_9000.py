@@ -24,7 +24,7 @@ def run_scrapers(days=1, offset_hours=2):
 
 
 def main():
-    bc.total_bet_amount = float(input("How much do you want to bet (dkk)?\n\t>>>"))
+    #bc.total_bet_amount = float(input("How much do you want to bet (dkk)?\n\t>>>"))
     i = 0
     duration = 500  # milliseconds
     freq = 440  # Hz
@@ -37,6 +37,7 @@ def main():
             winsound.Beep(freq, duration)
             time.sleep(1)
             winsound.Beep(freq, duration)
+            main()
 
         list = []
         for bet_list in bets.values():
